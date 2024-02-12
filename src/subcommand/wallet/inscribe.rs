@@ -4,7 +4,7 @@ use super::*;
 #[clap(
   group = ArgGroup::new("source")
       .required(true)
-      .args(&["file", "batch"]),
+      .args(&["file", "batch", "delegate"]),
 )]
 pub(crate) struct Inscribe {
   #[arg(
@@ -89,8 +89,8 @@ impl Inscribe {
     let parent_info;
     let sat;
 
-    match (self.file, self.batch) {
-      (Some(file), None) => {
+    match (self.file, self.batch, self.delegate) {
+      (Some(file), None, _) => {
         parent_info = wallet.get_parent_info(self.parent, &utxos)?;
 
         postage = self.postage.unwrap_or(TARGET_POSTAGE);
@@ -122,7 +122,7 @@ impl Inscribe {
           None => wallet.get_change_address()?,
         }];
       }
-      (None, Some(batch)) => {
+      (None, Some(batch), _) => {
         let batchfile = Batchfile::load(&batch)?;
 
         parent_info = wallet.get_parent_info(batchfile.parent, &utxos)?;
@@ -147,6 +147,33 @@ impl Inscribe {
         }
 
         sat = batchfile.sat;
+      }
+      (None, None, Some(delegate)) => {
+        parent_info = wallet.get_parent_info(self.parent, &utxos)?;
+
+        postage = self.postage.unwrap_or(TARGET_POSTAGE);
+
+        ensure! {
+          wallet.inscription_exists(delegate)?,
+          "delegate {delegate} does not exist"
+        }
+
+        inscriptions = vec![Inscription::without_file(
+          self.delegate,
+          metadata,
+          self.metaprotocol,
+          self.parent,
+          None,
+        )?];
+
+        mode = Mode::SeparateOutputs;
+
+        sat = self.sat;
+
+        destinations = vec![match self.destination.clone() {
+          Some(destination) => destination.require_network(chain.network())?,
+          None => wallet.get_change_address()?,
+        }];
       }
       _ => unreachable!(),
     }

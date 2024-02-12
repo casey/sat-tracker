@@ -108,6 +108,26 @@ impl Inscription {
     })
   }
 
+  pub(crate) fn without_file(
+    delegate: Option<InscriptionId>,
+    metadata: Option<Vec<u8>>,
+    metaprotocol: Option<String>,
+    parent: Option<InscriptionId>,
+    pointer: Option<u64>,
+  ) -> Result<Self, Error> {
+    Ok(Self {
+      body: None,
+      content_encoding: None,
+      content_type: None,
+      delegate: delegate.map(|delegate| delegate.value()),
+      metadata,
+      metaprotocol: metaprotocol.map(|metaprotocol| metaprotocol.into_bytes()),
+      parent: parent.map(|parent| parent.value()),
+      pointer: pointer.map(Self::pointer_value),
+      ..Default::default()
+    })
+  }
+
   pub(crate) fn pointer_value(pointer: u64) -> Vec<u8> {
     let mut bytes = pointer.to_le_bytes().to_vec();
 
