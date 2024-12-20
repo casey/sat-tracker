@@ -272,6 +272,10 @@ impl Server {
           "/r/sat/:sat_number/at/:index",
           get(Self::sat_inscription_at_index),
         )
+        .route(
+          "/r/sat/:sat_number/at/:index/content",
+          get(Self::sat_inscription_at_index_content),
+        )
         .route("/rare.txt", get(Self::rare_txt))
         .route("/rune/:rune", get(Self::rune))
         .route("/runes", get(Self::runes))
@@ -2271,6 +2275,35 @@ impl Server {
       let id = index.get_inscription_id_by_sat_indexed(sat, inscription_index)?;
 
       Ok(Json(api::SatInscription { id }))
+    })
+  }
+
+  async fn sat_inscription_at_index_content(
+    Extension(index): Extension<Arc<Index>>,
+    Extension(server_config): Extension<Arc<ServerConfig>>,
+    Path((DeserializeFromStr(sat), inscription_index)): Path<(DeserializeFromStr<Sat>, isize)>,
+    accept_encoding: AcceptEncoding,
+  ) -> ServerResult {
+    task::block_in_place(|| {
+      if !index.has_sat_index() {
+        return Err(ServerError::NotFound(
+          "this server has no sat index".to_string(),
+        ));
+      }
+
+      let inscription_id = index.get_inscription_id_by_sat_indexed(sat, inscription_index)?;
+
+      if let Some(id) = inscription_id {
+        if let Some(inscription) = index.get_inscription_by_id(id)? {
+          return Ok(
+            Self::content_response(inscription, accept_encoding, &server_config)?
+              .ok_or_not_found(|| format!("inscription {id} content"))?
+              .into_response(),
+          );
+        }
+      }
+
+      Err(ServerError::NotFound("inscription not found".to_string()))
     })
   }
 
@@ -7429,5 +7462,77 @@ next
       StatusCode::NOT_FOUND,
       "output 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:123 not found",
     );
+  }
+
+  #[test]
+  fn sat_inscription_at_index_content_endpoint() {
+    let server = TestServer::builder()
+      .index_sats()
+      .chain(Chain::Regtest)  // Add chain
+      .build();
+
+    server.mine_blocks(1);
+
+    // Create first inscription
+    let first_txid = server.core.broadcast_tx(TransactionTemplate {
+      inputs: &[(1, 0, 0, inscription("text/plain;charset=utf-8", "hello").to_witness())],
+      ..default()
+    });
+
+    server.mine_blocks(1);
+
+    // Get first inscription info...
+    let first_inscription_id = InscriptionId { txid: first_txid, index: 0 };
+    println!("First inscription ID: {}", first_inscription_id);
+    let first_inscription = server
+      .get_json::<api::InscriptionRecursive>(format!("/r/inscription/{first_inscription_id}"));
+    println!("First inscription: {:?}", first_inscription);
+    let sat = first_inscription.sat.expect("inscription should have a sat number");
+    println!("Sat number: {}", sat);
+    println!("Satpoint: {:?}", first_inscription.satpoint);
+
+    // Reinscribe on the same sat by using the output containing first inscription
+    let second_txid = server.core.broadcast_tx(TransactionTemplate {
+      inputs: &[(
+        2,
+        1,
+        first_inscription.satpoint.outpoint.vout.try_into().unwrap(),
+        inscription("text/plain;charset=utf-8", "alwaysbebuilding.bitmap 👷🏗️🟧🌌").to_witness(),
+      )],
+      ..default()
+    });
+
+    server.mine_blocks(1);
+    println!("Second inscription txid: {}", second_txid);
+
+    // Test fetching the content - should get the most recent inscription
+    server.assert_response(
+      format!("/r/sat/{}/at/-1/content", sat),
+      StatusCode::OK,
+      "alwaysbebuilding.bitmap 👷🏗️🟧🌌",
+    );
+
+    // Test fetching the first inscription
+    server.assert_response(
+      format!("/r/sat/{}/at/0/content", sat),
+      StatusCode::OK,
+      "hello",
+    );
+    
+      // Test error when sat index is disabled
+      let server = TestServer::new();
+      server.assert_response(
+        format!("/r/sat/{}/at/-1/content", sat),
+        StatusCode::NOT_FOUND,
+        "this server has no sat index"
+      );
+    
+      // Test error for non-existent inscription
+      let server = TestServer::builder().index_sats().build();
+      server.assert_response(
+        format!("/r/sat/{}/at/999/content", sat),
+        StatusCode::NOT_FOUND,
+        "inscription not found"
+      );
   }
 }

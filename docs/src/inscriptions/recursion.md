@@ -3370,6 +3370,31 @@ curl -s -H "Accept: application/json" \
 ```
 </details>
 
+<details>
+  <summary>
+    <code>GET</code>
+    <code><b>/r/sat/&lt;SAT_NUMBER&gt;/at/&lt;INDEX&gt;/content</b></code>
+  </summary>
+
+### Description
+
+The content of the inscription at `<INDEX>` of all inscriptions on a sat. `<INDEX>` may be a negative number to index from the back. `0` being the first and `-1` being the most recent for example. Requires index with `--index-sats` flag.
+
+### Example
+
+Fetch the most recently created inscription content from the queried satoshi
+
+```bash
+curl -s -H "Accept: application/json" \
+  http://0.0.0.0:80/r/sat/289488340427831/at/-1/content
+```
+
+Returns the appropriate mime-type and content of the last inscription created on the queried satoshi.
+```
+alwaysbebuilding.bitmap 👷🏗️🟧🌌
+```
+</details>
+
 &nbsp;
 &nbsp;
 
