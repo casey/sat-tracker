@@ -39,6 +39,7 @@ use {
   },
 };
 
+use crate::api::RawTransactionInfo;
 pub use server_config::ServerConfig;
 
 mod accept_encoding;
@@ -263,6 +264,7 @@ impl Server {
           "/r/parents/:inscription_id/:page",
           get(Self::parents_recursive_paginated),
         )
+        .route("/r/rawtxinfo/:txid", get(Self::get_raw_transaction_info))
         .route("/r/sat/:sat_number", get(Self::sat_inscriptions))
         .route(
           "/r/sat/:sat_number/:page",
@@ -1085,6 +1087,19 @@ impl Server {
         .page(server_config)
         .into_response()
       })
+    })
+  }
+
+  async fn get_raw_transaction_info(
+    Extension(index): Extension<Arc<Index>>,
+    Path(txid): Path<Txid>,
+  ) -> ServerResult<Json<RawTransactionInfo>> {
+    task::block_in_place(|| {
+      let raw_transaction_info = index
+        .raw_transaction_info(txid)?
+        .ok_or_not_found(|| format!("transaction {txid}"))?;
+
+      Ok(Json(api::RawTransactionInfo::from(raw_transaction_info)))
     })
   }
 
@@ -4348,6 +4363,20 @@ mod tests {
   </li>
 </ul>.*"
       ),
+    );
+  }
+
+  #[test]
+  fn raw_transaction_info() {
+    let test_server = TestServer::new();
+
+    let coinbase_tx = test_server.mine_blocks(1)[0].txdata[0].clone();
+    let txid = coinbase_tx.compute_txid();
+
+    test_server.assert_response(
+      format!("/r/rawtxinfo/{txid}"),
+      StatusCode::OK,
+      "{\"blockhash\":\"56d05060a0280d0712d113f25321158747310ece87ea9e299bde06cf385b8d85\",\"hex\":\"\",\"vin\":[],\"vout\":[{\"value\":50.0,\"n\":0,\"scriptPubKey\":{\"hex\":\"5120be7cbbe9ca06a7d7b2a17c6b4ff4b85b362cbcd7ee1970daa66dfaa834df59a0\"}}]}"
     );
   }
 

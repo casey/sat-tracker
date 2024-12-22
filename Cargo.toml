@@ -61,7 +61,7 @@ rustls-acme = { version = "0.8.1", features = ["axum"] }
 serde = { version = "1.0.137", features = ["derive"] }
 serde-hex = "0.1.0"
 serde_json = { version = "1.0.132", features = ["preserve_order"] }
-serde_with = "3.7.0"
+serde_with = { version = "3.7.0", features = ["hex"] }
 serde_yaml = "0.9.17"
 sha3 = "0.10.8"
 snafu = "0.8.3"

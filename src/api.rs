@@ -1,5 +1,9 @@
 use {
   super::*,
+  bitcoincore_rpc::bitcoincore_rpc_json::{
+    GetRawTransactionResult, GetRawTransactionResultVin, GetRawTransactionResultVout,
+    GetRawTransactionResultVoutScriptPubKey,
+  },
   serde_hex::{SerHex, Strict},
 };
 
@@ -232,4 +236,90 @@ pub struct AddressInfo {
   pub inscriptions: Option<Vec<InscriptionId>>,
   pub sat_balance: u64,
   pub runes_balances: Option<Vec<(SpacedRune, Decimal, Option<char>)>>,
+}
+
+#[serde_with::skip_serializing_none]
+#[serde_with::serde_as]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RawTransactionInfoVin {
+  /// The raw scriptSig in case of a coinbase tx.
+  #[serde_as(as = "Option<serde_with::hex::Hex>")]
+  pub coinbase: Option<Vec<u8>>,
+  /// Not provided for coinbase txs.
+  pub txid: Option<Txid>,
+  /// Not provided for coinbase txs.
+  pub vout: Option<u32>,
+}
+
+impl From<GetRawTransactionResultVin> for RawTransactionInfoVin {
+  fn from(vin: GetRawTransactionResultVin) -> Self {
+    RawTransactionInfoVin {
+      coinbase: vin.coinbase,
+      txid: vin.txid,
+      vout: vin.vout,
+    }
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RawTransactionInfoVout {
+  #[serde(with = "bitcoin::amount::serde::as_btc")]
+  pub value: Amount,
+  pub n: u32,
+  pub script_pub_key: RawTransactionInfoVoutScriptPubKey,
+}
+
+impl From<GetRawTransactionResultVout> for RawTransactionInfoVout {
+  fn from(vout: GetRawTransactionResultVout) -> Self {
+    RawTransactionInfoVout {
+      value: vout.value,
+      n: vout.n,
+      script_pub_key: RawTransactionInfoVoutScriptPubKey::from(vout.script_pub_key),
+    }
+  }
+}
+
+#[serde_with::serde_as]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+pub struct RawTransactionInfoVoutScriptPubKey {
+  #[serde_as(as = "serde_with::hex::Hex")]
+  pub hex: Vec<u8>,
+}
+
+impl From<GetRawTransactionResultVoutScriptPubKey> for RawTransactionInfoVoutScriptPubKey {
+  fn from(pub_key: GetRawTransactionResultVoutScriptPubKey) -> Self {
+    RawTransactionInfoVoutScriptPubKey {
+      hex: pub_key.hex,
+    }
+  }
+}
+
+#[serde_with::serde_as]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RawTransactionInfo {
+  pub blockhash: Option<BlockHash>,
+  #[serde_as(as = "serde_with::hex::Hex")]
+  pub hex: Vec<u8>,
+  pub vin: Vec<RawTransactionInfoVin>,
+  pub vout: Vec<RawTransactionInfoVout>,
+}
+
+impl From<GetRawTransactionResult> for RawTransactionInfo {
+  fn from(result: GetRawTransactionResult) -> Self {
+    RawTransactionInfo {
+      blockhash: result.blockhash,
+      hex: result.hex,
+      vin: result
+        .vin
+        .into_iter()
+        .map(RawTransactionInfoVin::from)
+        .collect(),
+      vout: result
+        .vout
+        .into_iter()
+        .map(RawTransactionInfoVout::from)
+        .collect(),
+    }
+  }
 }

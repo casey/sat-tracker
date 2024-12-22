@@ -1,3 +1,4 @@
+pub use self::entry::RuneEntry;
 use {
   self::{
     entry::{
@@ -18,7 +19,7 @@ use {
   },
   bitcoin::block::Header,
   bitcoincore_rpc::{
-    json::{GetBlockHeaderResult, GetBlockStatsResult},
+    json::{GetBlockHeaderResult, GetBlockStatsResult, GetRawTransactionResult},
     Client,
   },
   chrono::SubsecRound,
@@ -35,8 +36,6 @@ use {
     sync::Once,
   },
 };
-
-pub use self::entry::RuneEntry;
 
 pub(crate) mod entry;
 pub mod event;
@@ -1608,6 +1607,13 @@ impl Index {
     }
 
     self.client.get_raw_transaction(&txid, None).into_option()
+  }
+
+  pub fn raw_transaction_info(&self, txid: Txid) -> Result<Option<GetRawTransactionResult>> {
+    self
+      .client
+      .get_raw_transaction_info(&txid, None)
+      .into_option()
   }
 
   pub fn find(&self, sat: Sat) -> Result<Option<SatPoint>> {

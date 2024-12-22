@@ -3370,6 +3370,46 @@ curl -s -H "Accept: application/json" \
 ```
 </details>
 
+<details>
+  <summary>
+    <code>GET</code>
+    <code><b>/r/rawtxinfo/&lt;TRANSACTION_ID&gt;</b></code>
+  </summary>
+
+### Description
+
+Raw transaction data for `<TRANSACTION_ID>` with verbose information.
+
+### Example
+
+```bash
+curl -s -H "Accept: application/json" \
+  http://0.0.0.0:80/r/rawtxinfo/60bcf821240064a9c55225c4f01711b0ebbcab39aa3fafeefe4299ab158536fa
+```
+
+```json
+{
+  "blockhash": "00000000000000000000ce2459594de93b8d2f64b809b6c9d7fdd058bf970370",
+  "hex": "0100000000010183572872dcb32bee57003d53c2b8dbb5bc5819ff6478052599...",
+  "vin": [
+    {
+      "txid": "bdc7d178771f919925057864ff1958bcb5dbb8c2533d0057ee2bb3dc72285783",
+      "vout": 0
+    }
+  ],
+  "vout": [
+    {
+      "value": 0.0001,
+      "n": 0,
+      "scriptPubKey": {
+        "hex": "5120e41e0cba05c6ac797cf543ff9a6c619a91a53813e59146d1e32ea89747b111a6"
+      }
+    }
+  ]
+}
+```
+</details>
+
 &nbsp;
 &nbsp;
 
