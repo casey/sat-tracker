@@ -84,7 +84,14 @@ pub struct Children {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct ChildInscriptions {
-  pub children: Vec<ChildInscriptionRecursive>,
+  pub children: Vec<RelativeInscriptionRecursive>,
+  pub more: bool,
+  pub page: usize,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+pub struct ParentInscriptions {
+  pub parents: Vec<RelativeInscriptionRecursive>,
   pub more: bool,
   pub page: usize,
 }
@@ -132,7 +139,7 @@ pub struct InscriptionRecursive {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct ChildInscriptionRecursive {
+pub struct RelativeInscriptionRecursive {
   pub charms: Vec<Charm>,
   pub fee: u64,
   pub height: u32,

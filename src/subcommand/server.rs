@@ -263,6 +263,14 @@ impl Server {
           "/r/parents/:inscription_id/:page",
           get(Self::parents_recursive_paginated),
         )
+        .route(
+          "/r/parents/:inscription_id/inscriptions",
+          get(Self::parent_inscriptions_recursive),
+        )
+        .route(
+          "/r/parents/:inscription_id/inscriptions/:page",
+          get(Self::parent_inscriptions_recursive_paginated),
+        )
         .route("/r/sat/:sat_number", get(Self::sat_inscriptions))
         .route(
           "/r/sat/:sat_number/:page",
@@ -2043,7 +2051,7 @@ impl Server {
             .flatten()
             .unwrap();
 
-          api::ChildInscriptionRecursive {
+          api::RelativeInscriptionRecursive {
             charms: Charm::charms(entry.charms),
             fee: entry.fee,
             height: entry.height,
@@ -2198,7 +2206,8 @@ impl Server {
         .get_inscription_entry(id)?
         .ok_or_not_found(|| format!("inscription {id}"))?;
 
-      let (parents, more) = index.get_parents_by_sequence_number_paginated(child.parents, page)?;
+      let (parents, more) =
+        index.get_parents_by_sequence_number_paginated(child.parents, 100, page)?;
 
       let prev_page = page.checked_sub(1);
 
@@ -2234,7 +2243,7 @@ impl Server {
         .get_inscription_entry(inscription_id)?
         .ok_or_not_found(|| format!("inscription {inscription_id}"))?;
 
-      let (ids, more) = index.get_parents_by_sequence_number_paginated(child.parents, page)?;
+      let (ids, more) = index.get_parents_by_sequence_number_paginated(child.parents, 100, page)?;
 
       let page_index =
         u32::try_from(page).map_err(|_| anyhow!("page index {} out of range", page))?;
@@ -2244,6 +2253,63 @@ impl Server {
           ids,
           more,
           page_index,
+        })
+        .into_response(),
+      )
+    })
+  }
+
+  async fn parent_inscriptions_recursive(
+    Extension(index): Extension<Arc<Index>>,
+    Path(inscription_id): Path<InscriptionId>,
+  ) -> ServerResult {
+    Self::parent_inscriptions_recursive_paginated(Extension(index), Path((inscription_id, 0))).await
+  }
+
+  async fn parent_inscriptions_recursive_paginated(
+    Extension(index): Extension<Arc<Index>>,
+    Path((child, page)): Path<(InscriptionId, usize)>,
+  ) -> ServerResult {
+    task::block_in_place(|| {
+      let entry = index
+        .get_inscription_entry(child)?
+        .ok_or_not_found(|| format!("inscription {child}"))?;
+
+      let (ids, more) = index.get_parents_by_sequence_number_paginated(entry.parents, 100, page)?;
+
+      let parents = ids
+        .into_iter()
+        .map(|inscription_id| {
+          let entry = index
+            .get_inscription_entry(inscription_id)
+            .unwrap()
+            .unwrap();
+
+          let satpoint = index
+            .get_inscription_satpoint_by_id(inscription_id)
+            .ok()
+            .flatten()
+            .unwrap();
+
+          api::RelativeInscriptionRecursive {
+            charms: Charm::charms(entry.charms),
+            fee: entry.fee,
+            height: entry.height,
+            id: inscription_id,
+            number: entry.inscription_number,
+            output: satpoint.outpoint,
+            sat: entry.sat,
+            satpoint,
+            timestamp: timestamp(entry.timestamp.into()).timestamp(),
+          }
+        })
+        .collect();
+
+      Ok(
+        Json(api::ParentInscriptions {
+          parents,
+          more,
+          page,
         })
         .into_response(),
       )
@@ -6808,6 +6874,129 @@ next
 
     assert!(!child_inscriptions_json.more);
     assert_eq!(child_inscriptions_json.page, 1);
+  }
+
+  #[test]
+  fn parent_inscriptions_recursive_endpoint() {
+    let server = TestServer::builder().chain(Chain::Regtest).build();
+    server.mine_blocks(1);
+
+    let mut builder = script::Builder::new();
+    for _ in 0..111 {
+      builder = Inscription {
+        content_type: Some("text/plain".into()),
+        body: Some("hello".into()),
+        unrecognized_even_field: false,
+        ..default()
+      }
+      .append_reveal_script_to_builder(builder);
+    }
+
+    let witness = Witness::from_slice(&[builder.into_bytes(), Vec::new()]);
+
+    let parents_txid = server.core.broadcast_tx(TransactionTemplate {
+      inputs: &[(1, 0, 0, witness)],
+      ..default()
+    });
+
+    server.mine_blocks(1);
+
+    let mut builder = script::Builder::new();
+    builder = Inscription {
+      content_type: Some("text/plain".into()),
+      body: Some("hello".into()),
+      parents: (0..111)
+        .map(|i| {
+          InscriptionId {
+            txid: parents_txid,
+            index: i,
+          }
+          .value()
+        })
+        .collect(),
+      unrecognized_even_field: false,
+      ..default()
+    }
+    .append_reveal_script_to_builder(builder);
+
+    let witness = Witness::from_slice(&[builder.into_bytes(), Vec::new()]);
+
+    let child_txid = server.core.broadcast_tx(TransactionTemplate {
+      inputs: &[(2, 0, 0, witness), (2, 1, 0, Default::default())],
+      ..default()
+    });
+
+    let child_inscription_id = InscriptionId {
+      txid: child_txid,
+      index: 0,
+    };
+
+    server.assert_response(
+      format!("/r/parents/{child_inscription_id}/inscriptions"),
+      StatusCode::NOT_FOUND,
+      &format!("inscription {child_inscription_id} not found"),
+    );
+
+    server.mine_blocks(1);
+
+    let first_parent_inscription_id = InscriptionId {
+      txid: parents_txid,
+      index: 0,
+    };
+    let hundredth_parent_inscription_id = InscriptionId {
+      txid: parents_txid,
+      index: 99,
+    };
+    let hundred_first_parent_inscription_id = InscriptionId {
+      txid: parents_txid,
+      index: 100,
+    };
+    let hundred_eleventh_parent_inscription_id = InscriptionId {
+      txid: parents_txid,
+      index: 110,
+    };
+
+    let parent_inscriptions_json = server.get_json::<api::ParentInscriptions>(format!(
+      "/r/parents/{child_inscription_id}/inscriptions"
+    ));
+
+    assert_eq!(parent_inscriptions_json.parents.len(), 100);
+
+    assert_eq!(
+      parent_inscriptions_json.parents[0].id,
+      first_parent_inscription_id
+    );
+    assert_eq!(parent_inscriptions_json.parents[0].number, 0); // parents are #0 and -1 to -110, child is #1
+
+    assert_eq!(
+      parent_inscriptions_json.parents[99].id,
+      hundredth_parent_inscription_id
+    );
+    assert_eq!(parent_inscriptions_json.parents[99].number, -99); // all but 1st parent are cursed
+
+    assert!(parent_inscriptions_json.more);
+    assert_eq!(parent_inscriptions_json.page, 0);
+
+    let parent_inscriptions_json = server.get_json::<api::ParentInscriptions>(format!(
+      "/r/parents/{child_inscription_id}/inscriptions/1"
+    ));
+
+    assert_eq!(parent_inscriptions_json.parents.len(), 11);
+
+    assert_eq!(
+      parent_inscriptions_json.parents[0].id,
+      hundred_first_parent_inscription_id
+    );
+    assert_eq!(parent_inscriptions_json.parents[0].number, -100);
+
+    assert_eq!(
+      parent_inscriptions_json.parents[10].id,
+      hundred_eleventh_parent_inscription_id
+    );
+    assert_eq!(parent_inscriptions_json.parents[10].number, -110);
+
+    assert!(!parent_inscriptions_json.more);
+    assert_eq!(parent_inscriptions_json.page, 1);
   }
 
   #[test]
