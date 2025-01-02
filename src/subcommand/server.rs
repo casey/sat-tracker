@@ -2276,18 +2276,26 @@ impl Server {
 
   async fn sat_inscription_at_index(
     Extension(index): Extension<Arc<Index>>,
+    Extension(server_config): Extension<Arc<ServerConfig>>,
     Path((DeserializeFromStr(sat), inscription_index)): Path<(DeserializeFromStr<Sat>, isize)>,
-  ) -> ServerResult<Json<api::SatInscription>> {
+  ) -> ServerResult {
     task::block_in_place(|| {
       if !index.has_sat_index() {
-        return Err(ServerError::NotFound(
-          "this server has no sat index".to_string(),
-        ));
+        return if let Some(proxy) = server_config.proxy.as_ref() {
+          Self::proxy(proxy, &format!("r/sat/{}/at/{}", sat, inscription_index))
+        } else {
+          Err(ServerError::NotFound(
+            "this server has no sat index".to_string(),
+          ))
+        };
       }
 
       let id = index.get_inscription_id_by_sat_indexed(sat, inscription_index)?;
+      if let (Some(proxy), None) = (server_config.proxy.as_ref(), id) {
+        return Self::proxy(proxy, &format!("r/sat/{}/at/{}", sat, inscription_index));
+      }
 
-      Ok(Json(api::SatInscription { id }))
+      Ok(Json(api::SatInscription { id }).into_response())
     })
   }
 
