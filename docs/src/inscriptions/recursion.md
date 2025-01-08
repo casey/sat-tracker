@@ -247,6 +247,28 @@ curl -s  \
 <details>
   <summary>
     <code>GET</code>
+    <code><b>/r/txhex/&lt;TRANSACTION_ID&gt;</b></code>
+  </summary>
+
+### Description
+
+Raw transaction hex for `<TRANSACTION_ID>`.
+
+### Example
+
+```bash
+curl -s -H "Accept: application/json" \
+  http://0.0.0.0:80/r/txhex/60bcf821240064a9c55225c4f01711b0ebbcab39aa3fafeefe4299ab158536fa
+```
+
+```json
+"0100000000010183572872dcb32bee57003d53c2b8dbb5bc5819ff6478052599911f7778d1c7bd0000000000fdffffff011027000000000000225120e41e0cba05c6ac797cf543ff9a6c619a91a53813e59146d1e32ea89747b111a603407aa50d93d6fc01265fd52d3edc93af4e009ccc1a704ce1b5cb8ede1412a5df31eba587d080b3dc903ceb9002ed9d921aad323fd44d7b4dc2a1ad2ea12d4360424d20c7a3a38df198a4fcde7d5dac5819ed19ff4d25bb893c9511f8e1f51d59326effac0063036f7264010118746578742f706c61696e3b636861727365743d7574662d3800077072696d65730a6821c1c7a3a38df198a4fcde7d5dac5819ed19ff4d25bb893c9511f8e1f51d59326eff00000000"
+```
+</details>
+
+<details>
+  <summary>
+    <code>GET</code>
     <code><b>/r/children/&lt;INSCRIPTION_ID&gt;</b></code>
   </summary>
 
