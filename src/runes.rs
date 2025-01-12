@@ -59,7 +59,7 @@ mod tests {
 
     context.etch(Default::default(), 1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(1, 0, 0, Witness::new())],
       op_return: Some(Runestone::default().encipher()),
       ..default()
@@ -290,7 +290,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    let txid0 = context.core.broadcast_tx(TransactionTemplate {
+    let txid0 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(1, 0, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -342,7 +342,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -738,7 +738,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -882,7 +882,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(1, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -950,7 +950,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -1029,7 +1029,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(Runestone::default().encipher()),
       ..default()
@@ -1107,7 +1107,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(Runestone::default().encipher()),
       outputs: 0,
@@ -1181,7 +1181,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -1266,7 +1266,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -1347,7 +1347,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: None,
       ..default()
@@ -1568,7 +1568,7 @@ mod tests {
       ],
     );
 
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[
         (id0.block.try_into().unwrap(), 1, 0, Witness::new()),
         (id1.block.try_into().unwrap(), 1, 0, Witness::new()),
@@ -1732,7 +1732,7 @@ mod tests {
       ],
     );
 
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[
         (id0.block.try_into().unwrap(), 1, 0, Witness::new()),
         (id1.block.try_into().unwrap(), 1, 0, Witness::new()),
@@ -1783,7 +1783,7 @@ mod tests {
       )],
     );
 
-    let txid3 = context.core.broadcast_tx(TransactionTemplate {
+    let txid3 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[((id1.block + 1).try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -1972,7 +1972,7 @@ mod tests {
       ],
     );
 
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[
         (id0.block.try_into().unwrap(), 1, 0, Witness::new()),
         (id1.block.try_into().unwrap(), 1, 0, Witness::new()),
@@ -2088,7 +2088,7 @@ mod tests {
       )],
     );
 
-    let txid = context.core.broadcast_tx(TransactionTemplate {
+    let txid = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         script::Builder::new()
@@ -2254,7 +2254,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -2416,7 +2416,7 @@ mod tests {
       ],
     );
 
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id0.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -2537,7 +2537,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -3065,7 +3065,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -3163,7 +3163,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -3268,7 +3268,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -3373,7 +3373,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -3471,7 +3471,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 4,
       op_return: Some(
@@ -3576,7 +3576,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 4,
       op_return: Some(
@@ -3777,7 +3777,7 @@ mod tests {
       )],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -3864,7 +3864,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -3952,7 +3952,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -4047,7 +4047,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4097,7 +4097,7 @@ mod tests {
     );
 
     // claim the rune
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(4, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4156,7 +4156,7 @@ mod tests {
     );
 
     // claim the rune in a burn runestone
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(5, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4257,7 +4257,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4284,7 +4284,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4350,7 +4350,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4366,7 +4366,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4434,7 +4434,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4450,7 +4450,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4518,7 +4518,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4545,7 +4545,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4611,7 +4611,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4637,7 +4637,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4703,7 +4703,7 @@ mod tests {
 
     context.assert_runes([(id, entry)], []);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4729,7 +4729,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4795,7 +4795,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4813,7 +4813,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4881,7 +4881,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4899,7 +4899,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -4976,7 +4976,7 @@ mod tests {
       [(OutPoint { txid, vout: 0 }, vec![(id, 1111)])],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -5057,7 +5057,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5105,7 +5105,7 @@ mod tests {
       )],
     );
 
-    let txid2 = context.core.broadcast_tx(TransactionTemplate {
+    let txid2 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5162,7 +5162,7 @@ mod tests {
       ],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(4, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5262,7 +5262,7 @@ mod tests {
       [],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5347,7 +5347,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(3, 0, 0, Witness::new())],
       outputs: 2,
       op_return: Some(
@@ -5567,7 +5567,7 @@ mod tests {
       1,
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5658,7 +5658,7 @@ mod tests {
       [],
     );
 
-    let txid1 = context.core.broadcast_tx(TransactionTemplate {
+    let txid1 = context.core.broadcast_template(TransactionTemplate {
       inputs: &[(2, 0, 0, Witness::new())],
       op_return: Some(
         Runestone {
@@ -5727,7 +5727,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count, 0, 0, Witness::new())],
       p2tr: false,
       ..default()
@@ -5767,7 +5767,7 @@ mod tests {
 
     witness.push([]);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count + 1, 1, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs: 1,
@@ -5787,7 +5787,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count, 0, 0, Witness::new())],
       p2tr: true,
       ..default()
@@ -5827,7 +5827,7 @@ mod tests {
 
     witness.push([]);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count + 1, 1, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs: 1,
@@ -5847,7 +5847,7 @@ mod tests {
 
     context.mine_blocks_with_update(1, false);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count, 0, 0, Witness::new())],
       p2tr: true,
       ..default()
@@ -5887,7 +5887,7 @@ mod tests {
 
     witness.push([]);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count + 1, 1, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs: 1,
@@ -5909,7 +5909,7 @@ mod tests {
 
     context.mine_blocks(1);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count, 0, 0, Witness::new())],
       p2tr: true,
       ..default()
@@ -5939,7 +5939,7 @@ mod tests {
 
     witness.push([]);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count + 1, 1, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs: 1,
@@ -5974,7 +5974,7 @@ mod tests {
     witness.push([opcodes::all::OP_PUSHDATA4.to_u8()]);
     witness.push([]);
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(1, 0, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs: 1,
@@ -6026,7 +6026,7 @@ mod tests {
       )],
     );
 
-    context.core.broadcast_tx(TransactionTemplate {
+    context.core.broadcast_template(TransactionTemplate {
       inputs: &[(id.block.try_into().unwrap(), 1, 0, Witness::new())],
       op_return: Some(
         Runestone {

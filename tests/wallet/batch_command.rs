@@ -1106,7 +1106,7 @@ inscriptions:
 
   ord.assert_response_regex(
     format!("/inscription/{}", inscribe.inscriptions[0].id),
-    format!(r#".*<dt>delegate</dt>\s*<dd><a href=/inscription/{delegate}>{delegate}</a></dd>.*"#,),
+    format!(r#".*<dt>delegates</dt>\s*<dd><a href=/inscription/{delegate}>{delegate}</a></dd>.*"#,),
   );
 
   ord.assert_response(format!("/content/{}", inscribe.inscriptions[0].id), "FOO");

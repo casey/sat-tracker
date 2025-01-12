@@ -157,7 +157,7 @@ impl Context {
 
     self.mine_blocks(1);
 
-    self.core.broadcast_tx(TransactionTemplate {
+    self.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count, 0, 0, Witness::new())],
       p2tr: true,
       ..default()
@@ -187,7 +187,7 @@ impl Context {
 
     witness.push([]);
 
-    let txid = self.core.broadcast_tx(TransactionTemplate {
+    let txid = self.core.broadcast_template(TransactionTemplate {
       inputs: &[(block_count + 1, 1, 0, witness)],
       op_return: Some(runestone.encipher()),
       outputs,

@@ -49,7 +49,7 @@ impl From<RawEnvelope> for ParsedEnvelope {
 
     let content_encoding = Tag::ContentEncoding.take(&mut fields);
     let content_type = Tag::ContentType.take(&mut fields);
-    let delegate = Tag::Delegate.take(&mut fields);
+    let delegates = Tag::Delegate.take_array(&mut fields);
     let metadata = Tag::Metadata.take(&mut fields);
     let metaprotocol = Tag::Metaprotocol.take(&mut fields);
     let parents = Tag::Parent.take_array(&mut fields);
@@ -71,7 +71,7 @@ impl From<RawEnvelope> for ParsedEnvelope {
         }),
         content_encoding,
         content_type,
-        delegate,
+        delegates,
         duplicate_field,
         incomplete_field,
         metadata,

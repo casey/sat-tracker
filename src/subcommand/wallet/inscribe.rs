@@ -71,7 +71,7 @@ impl Inscribe {
       inscriptions: vec![Inscription::new(
         chain,
         self.shared.compress,
-        self.delegate,
+        self.delegate.into_iter().collect(),
         WalletCommand::parse_metadata(self.cbor_metadata, self.json_metadata)?,
         self.metaprotocol,
         self.parent.into_iter().collect(),

@@ -134,7 +134,7 @@ impl File {
       inscriptions.push(Inscription::new(
         wallet.chain(),
         compress,
-        entry.delegate,
+        entry.delegate.into_iter().collect(),
         entry.metadata()?,
         entry.metaprotocol.clone(),
         self.parents.clone(),

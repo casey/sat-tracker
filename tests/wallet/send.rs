@@ -874,7 +874,7 @@ fn sending_rune_creates_change_output_for_non_outgoing_runes() {
     .next()
     .unwrap();
 
-  let merge = core.broadcast_tx(TransactionTemplate {
+  let merge = core.broadcast_template(TransactionTemplate {
     inputs: &[(a_block, a_tx, 1, default()), (b_block, b_tx, 1, default())],
     recipient: Some(address.require_network(Network::Regtest).unwrap()),
     ..default()

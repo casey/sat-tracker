@@ -264,7 +264,7 @@ fn get_inscriptions() {
     core.mine_blocks(1);
     core.mine_blocks(1);
 
-    let txid = core.broadcast_tx(TransactionTemplate {
+    let txid = core.broadcast_template(TransactionTemplate {
       inputs: &[
         (i * 3 + 1, 0, 0, witness.clone()),
         (i * 3 + 2, 0, 0, witness.clone()),
@@ -311,7 +311,7 @@ fn get_inscriptions_in_block() {
 
   let envelope = envelope(&[b"ord", &[1], b"text/plain;charset=utf-8", &[], b"bar"]);
 
-  let txid = core.broadcast_tx(TransactionTemplate {
+  let txid = core.broadcast_template(TransactionTemplate {
     inputs: &[
       (1, 0, 0, envelope.clone()),
       (2, 0, 0, envelope.clone()),
@@ -322,14 +322,14 @@ fn get_inscriptions_in_block() {
 
   core.mine_blocks(1);
 
-  let _ = core.broadcast_tx(TransactionTemplate {
+  let _ = core.broadcast_template(TransactionTemplate {
     inputs: &[(4, 0, 0, envelope.clone()), (5, 0, 0, envelope.clone())],
     ..default()
   });
 
   core.mine_blocks(1);
 
-  let _ = core.broadcast_tx(TransactionTemplate {
+  let _ = core.broadcast_template(TransactionTemplate {
     inputs: &[(6, 0, 0, envelope.clone())],
     ..default()
   });
@@ -363,7 +363,7 @@ fn get_output() {
 
   let envelope = envelope(&[b"ord", &[1], b"text/plain;charset=utf-8", &[], b"bar"]);
 
-  let txid = core.broadcast_tx(TransactionTemplate {
+  let txid = core.broadcast_template(TransactionTemplate {
     inputs: &[
       (1, 0, 0, envelope.clone()),
       (2, 0, 0, envelope.clone()),
@@ -724,7 +724,7 @@ fn get_decode_tx() {
 
   let envelope = envelope(&[b"ord", &[1], b"text/plain;charset=utf-8", &[], b"bar"]);
 
-  let txid = core.broadcast_tx(TransactionTemplate {
+  let txid = core.broadcast_template(TransactionTemplate {
     inputs: &[(1, 0, 0, envelope.clone())],
     ..default()
   });

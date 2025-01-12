@@ -535,4 +535,138 @@ mod tests {
       .unindent()
     );
   }
+
+  #[test]
+  fn single_delegate() {
+    assert_regex_match!(
+      InscriptionHtml {
+        fee: 1,
+        inscription: Inscription {
+          delegates: vec![inscription_id(2).value()],
+          ..inscription("text/plain;charset=utf-8", "HELLOWORLD")
+        },
+        id: inscription_id(1),
+        number: 1,
+        satpoint: satpoint(1, 0),
+        ..default()
+      },
+      "
+        <h1>Inscription 1</h1>
+        <div class=inscription>
+        <div>❮</div>
+        <iframe .* src=/preview/1{64}i1></iframe>
+        <div>❯</div>
+        </div>
+        <dl>
+          <dt>id</dt>
+          <dd class=collapse>1{64}i1</dd>
+          <dt>delegates</dt>
+          <dd><a href=/inscription/2{64}i2>2{64}i2</a></dd>
+          <dt>preview</dt>
+          <dd><a href=/preview/1{64}i1>link</a></dd>
+          <dt>content</dt>
+          <dd><a href=/content/1{64}i1>link</a></dd>
+          <dt>content length</dt>
+          <dd>10 bytes</dd>
+          <dt>content type</dt>
+          <dd>text/plain;charset=utf-8</dd>
+          <dt>timestamp</dt>
+          <dd><time>1970-01-01 00:00:00 UTC</time></dd>
+          <dt>height</dt>
+          <dd><a href=/block/0>0</a></dd>
+          <dt>fee</dt>
+          <dd>1</dd>
+          <dt>reveal transaction</dt>
+          <dd><a class=collapse href=/tx/1{64}>1{64}</a></dd>
+          <dt>location</dt>
+          <dd><a class=collapse href=/satpoint/1{64}:1:0>1{64}:1:0</a></dd>
+          <dt>output</dt>
+          <dd><a class=collapse href=/output/1{64}:1>1{64}:1</a></dd>
+          <dt>offset</dt>
+          <dd>0</dd>
+          <dt>details</dt>
+          <dd>
+            <details>
+              <summary>...</summary>
+              <dl>
+                <dt>ethereum teleburn address</dt>
+                <dd class=collapse>0xa1DfBd1C519B9323FD7Fd8e498Ac16c2E502F059</dd>
+              </dl>
+            </details>
+          </dd>
+        </dl>
+      "
+      .unindent()
+    );
+  }
+
+  #[test]
+  fn multiple_delegate() {
+    assert_regex_match!(
+      InscriptionHtml {
+        fee: 1,
+        inscription: Inscription {
+          delegates: vec![
+            inscription_id(2).value(),
+            inscription_id(3).value(),
+            inscription_id(4).value()
+          ],
+          ..inscription("text/plain;charset=utf-8", "HELLOWORLD")
+        },
+        id: inscription_id(1),
+        number: 1,
+        satpoint: satpoint(1, 0),
+        ..default()
+      },
+      "
+        <h1>Inscription 1</h1>
+        <div class=inscription>
+        <div>❮</div>
+        <iframe .* src=/preview/1{64}i1></iframe>
+        <div>❯</div>
+        </div>
+        <dl>
+          <dt>id</dt>
+          <dd class=collapse>1{64}i1</dd>
+          <dt>delegates</dt>
+          <dd><a href=/inscription/2{64}i2>2{64}i2</a></dd>
+          <dd><a href=/inscription/3{64}i3>3{64}i3</a></dd>
+          <dd><a href=/inscription/4{64}i4>4{64}i4</a></dd>
+          <dt>preview</dt>
+          <dd><a href=/preview/1{64}i1>link</a></dd>
+          <dt>content</dt>
+          <dd><a href=/content/1{64}i1>link</a></dd>
+          <dt>content length</dt>
+          <dd>10 bytes</dd>
+          <dt>content type</dt>
+          <dd>text/plain;charset=utf-8</dd>
+          <dt>timestamp</dt>
+          <dd><time>1970-01-01 00:00:00 UTC</time></dd>
+          <dt>height</dt>
+          <dd><a href=/block/0>0</a></dd>
+          <dt>fee</dt>
+          <dd>1</dd>
+          <dt>reveal transaction</dt>
+          <dd><a class=collapse href=/tx/1{64}>1{64}</a></dd>
+          <dt>location</dt>
+          <dd><a class=collapse href=/satpoint/1{64}:1:0>1{64}:1:0</a></dd>
+          <dt>output</dt>
+          <dd><a class=collapse href=/output/1{64}:1>1{64}:1</a></dd>
+          <dt>offset</dt>
+          <dd>0</dd>
+          <dt>details</dt>
+          <dd>
+            <details>
+              <summary>...</summary>
+              <dl>
+                <dt>ethereum teleburn address</dt>
+                <dd class=collapse>0xa1DfBd1C519B9323FD7Fd8e498Ac16c2E502F059</dd>
+              </dl>
+            </details>
+          </dd>
+        </dl>
+      "
+      .unindent()
+    );
+  }
 }

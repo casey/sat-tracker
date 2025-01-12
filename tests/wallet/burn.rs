@@ -79,7 +79,7 @@ fn runic_outputs_are_protected() {
 
   core.mine_blocks(2);
 
-  let txid = core.broadcast_tx(TransactionTemplate {
+  let txid = core.broadcast_template(TransactionTemplate {
     inputs: &[
       // send rune and inscription to the same output
       (height as usize, 2, 0, Witness::new()),
@@ -190,7 +190,7 @@ fn cannot_burn_inscription_sharing_utxo_with_another_inscription() {
   let (inscription2, _) = inscribe_with_options(&core, &ord, Some(1000), 1);
   let height2 = core.height();
 
-  let txid = core.broadcast_tx(TransactionTemplate {
+  let txid = core.broadcast_template(TransactionTemplate {
     inputs: &[
       // send all 3 inscriptions on a single output
       (height0 as usize, 2, 0, Witness::new()),

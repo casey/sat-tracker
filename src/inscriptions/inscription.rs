@@ -13,7 +13,7 @@ pub struct Inscription {
   pub body: Option<Vec<u8>>,
   pub content_encoding: Option<Vec<u8>>,
   pub content_type: Option<Vec<u8>>,
-  pub delegate: Option<Vec<u8>>,
+  pub delegates: Vec<Vec<u8>>,
   pub duplicate_field: bool,
   pub incomplete_field: bool,
   pub metadata: Option<Vec<u8>>,
@@ -28,7 +28,7 @@ impl Inscription {
   pub fn new(
     chain: Chain,
     compress: bool,
-    delegate: Option<InscriptionId>,
+    delegates: Vec<InscriptionId>,
     metadata: Option<Vec<u8>>,
     metaprotocol: Option<String>,
     parents: Vec<InscriptionId>,
@@ -96,7 +96,7 @@ impl Inscription {
       body,
       content_encoding,
       content_type: content_type.map(|content_type| content_type.into()),
-      delegate: delegate.map(|delegate| delegate.value()),
+      delegates: delegates.iter().map(|delegate| delegate.value()).collect(),
       metadata,
       metaprotocol: metaprotocol.map(|metaprotocol| metaprotocol.into_bytes()),
       parents: parents.iter().map(|parent| parent.value()).collect(),
@@ -126,7 +126,7 @@ impl Inscription {
     Tag::ContentEncoding.append(&mut builder, &self.content_encoding);
     Tag::Metaprotocol.append(&mut builder, &self.metaprotocol);
     Tag::Parent.append_array(&mut builder, &self.parents);
-    Tag::Delegate.append(&mut builder, &self.delegate);
+    Tag::Delegate.append_array(&mut builder, &self.delegates);
     Tag::Pointer.append(&mut builder, &self.pointer);
     Tag::Metadata.append(&mut builder, &self.metadata);
     Tag::Rune.append(&mut builder, &self.rune);
@@ -231,8 +231,12 @@ impl Inscription {
     HeaderValue::from_str(str::from_utf8(self.content_encoding.as_ref()?).unwrap_or_default()).ok()
   }
 
-  pub fn delegate(&self) -> Option<InscriptionId> {
-    Self::inscription_id_field(self.delegate.as_deref())
+  pub(crate) fn delegates(&self) -> Vec<InscriptionId> {
+    self
+      .delegates
+      .iter()
+      .filter_map(|delegate| Self::inscription_id_field(Some(delegate)))
+      .collect()
   }
 
   pub fn metadata(&self) -> Option<Value> {
@@ -480,14 +484,15 @@ mod tests {
   fn inscription_delegate_txid_is_deserialized_correctly() {
     assert_eq!(
       Inscription {
-        delegate: Some(vec![
+        delegates: vec![vec![
           0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
           0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d,
           0x1e, 0x1f,
-        ]),
+        ]],
         ..default()
       }
-      .delegate()
+      .delegates()
+      .first()
       .unwrap()
       .txid,
       "1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100"
@@ -769,7 +774,7 @@ mod tests {
     let inscription = Inscription::new(
       Chain::Mainnet,
       false,
-      None,
+      Vec::new(),
       None,
       None,
       Vec::new(),
@@ -784,7 +789,7 @@ mod tests {
     let inscription = Inscription::new(
       Chain::Mainnet,
       false,
-      None,
+      Vec::new(),
       None,
       None,
       Vec::new(),
@@ -799,7 +804,7 @@ mod tests {
     let inscription = Inscription::new(
       Chain::Mainnet,
       false,
-      None,
+      Vec::new(),
       None,
       None,
       Vec::new(),
@@ -814,7 +819,7 @@ mod tests {
     let inscription = Inscription::new(
       Chain::Mainnet,
       false,
-      None,
+      Vec::new(),
       None,
       None,
       Vec::new(),
